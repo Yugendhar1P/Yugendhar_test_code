@@ -1,29 +1,30 @@
-name: githubaction
+name: OIDC Debug
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  testaws:
-    name: GithubAction-demo
+  debug:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials from Test account
+      - name: Print GitHub Context
+        run: |
+          echo "Repository=${{ github.repository }}"
+          echo "Ref=${{ github.ref }}"
+          echo "Actor=${{ github.actor }}"
+
+      - name: Debug OIDC Claims
+        uses: github/actions-oidc-debugger@main
+
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::721274598429:role/Githubactionsrole
-          aws-region: us-west-1
-
-      - name: Test aws credential
-        run: |
-          aws s3 ls
+          role-to-assume: arn:aws:iam::721274598429:role/Githuboidcrole
+          aws-region: ap-south-1
