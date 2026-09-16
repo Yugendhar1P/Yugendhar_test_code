@@ -1,25 +1,29 @@
-name: AWS OIDC Test
+name: githubaction
 
 on:
-  workflow_dispatch:
-
-permissions:
-  id-token: write
-  contents: read
+  push:
+    branches:
+      - main
 
 jobs:
-  test:
+  testaws:
+    name: GithubAction-demo
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    permissions:
+      id-token: write
+      contents: read
 
-      - name: Configure AWS Credentials
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials from Test account
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::721274598429:role/Githuboidcrole
-          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::721274598429:role/Githubactionsrole
+          aws-region: us-west-1
 
-
-      - name: Verify AWS Connection
-        run: aws sts get-caller-identity
+      - name: Test aws credential
+        run: |
+          aws s3 ls
